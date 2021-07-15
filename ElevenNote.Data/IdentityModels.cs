@@ -1,4 +1,7 @@
-﻿using System.Security.Claims;
+﻿using System.Data.Entity;
+using System.Data.Entity.ModelConfiguration;
+using System.Data.Entity.ModelConfiguration.Conventions;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -28,6 +31,35 @@ namespace ElevenNote.Data
         public static ApplicationDbContext Create()
         {
             return new ApplicationDbContext();
+        }
+        public DbSet<Note> Notes { get; set; } //<---
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder
+                .Conventions
+                .Remove<PluralizingTableNameConvention>();
+
+            modelBuilder
+                .Configurations
+                .Add(new IdentifyUserLoginConfiguration())
+                .Add(new IdentifyUserRoleConfiguration());
+        }
+    }
+
+    public class IdentifyUserLoginConfiguration : EntityTypeConfiguration<IdentityUserLogin>
+    {
+        public IdentifyUserLoginConfiguration()
+        {
+            HasKey(iul => iul.UserId);
+        }
+    }
+
+    public class IdentifyUserRoleConfiguration : EntityTypeConfiguration<IdentityUserRole>
+    {
+        public IdentifyUserRoleConfiguration()
+        {
+            HasKey(iur => iur.UserId);
         }
     }
 }
