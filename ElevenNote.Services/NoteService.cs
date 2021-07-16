@@ -20,6 +20,8 @@ namespace ElevenNote.Services
         //PGPD
 
         //Post 
+
+        // This will create a instance of Note
         public bool CreateNote(NoteCreate model)
         {
             var entity =
@@ -39,6 +41,8 @@ namespace ElevenNote.Services
         }
 
         //Get
+
+        //This method will allow us to see all the notes that belong to a specific user.
         public IEnumerable<NoteListItem> GetNotes()
         {
             using (var ctx = new ApplicationDbContext())
@@ -56,8 +60,30 @@ namespace ElevenNote.Services
                                     CreatedUtc = e.CreatedUtc
                                 }
                         );
-                return query.ToArray();  
+                return query.ToArray();
             }
+        }
+
+        public NoteDetail GetNoteById(int id)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                var enity =
+                    ctx
+                        .Notes
+                        .Single(e => e.NoteId == id && e.OwnerId == _userId);
+                return
+                    new NoteDetail
+                    {
+                        NoteId = enity.NoteId,
+                        Title = enity.Title,
+                        Content = enity.Content,
+                        CreatedUtc = enity.CreatedUtc,
+                        ModifiedUtc = enity.ModifiedUtc
+                    };
+            }
+
+
         }
 
     }
